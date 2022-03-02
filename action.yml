@@ -11,10 +11,6 @@ inputs:
     description: Whether to exclude pyproject.toml tool.poetry.dev-dependencies
     required: false
     default: "true"
-  cache-buster:
-    description: Append string to cache key
-    required: false
-    default: ""
   install-cmd:
     description: Command to install all project dependencies
     required: false
@@ -27,6 +23,10 @@ inputs:
     description: Append arguments to the install command
     required: false
     default: ""
+  cache-buster:
+    description: Append string to cache key
+    required: false
+    default: ""
 
 
 runs:
@@ -34,7 +34,7 @@ runs:
   steps:
 
     - name: Install Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with: {python-version: "${{ inputs.python-version }}"}
 
     - name: Install Poetry
@@ -48,7 +48,7 @@ runs:
       id: cache
       uses: actions/cache@v2
       with:
-        key: "${{ runner.os }}-venv-${{ hashFiles('poetry.lock') }}-${{ join(inputs.*, '@') }}"
+        key: "init-deps-py-${{ runner.os }}-venv-${{ hashFiles('poetry.lock') }}-${{ join(inputs.*, '@') }}"
         path: .venv
 
     - name: Validate venv
@@ -98,9 +98,6 @@ outputs:
   no-dev-deps:
     description: Same as input
     value: ${{ inputs.no-dev-deps }}
-  cache-buster:
-    description: Same as input
-    value: ${{ inputs.cache-buster }}
   install-cmd:
     description: Same as input
     value: ${{ inputs.install-cmd }}
@@ -110,6 +107,9 @@ outputs:
   postargs:
     description: Same as input
     value: ${{ inputs.postargs }}
+  cache-buster:
+    description: Same as input
+    value: ${{ inputs.cache-buster }}
   cache-hit:
     description: If an exact match was found for the generated cache key
     value: ${{ steps.cache.outputs.cache-hit }}
