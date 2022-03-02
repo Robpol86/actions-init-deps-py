@@ -15,11 +15,11 @@ inputs:
     description: Append string to cache key
     required: false
     default: ""
-  poetry-install-cmd:
+  install-cmd:
     description: Command to install all project dependencies
     required: false
     default: "poetry install"
-  poetry-install-cmd-no-dev:
+  install-cmd-no-dev:
     description: Command to install project dependencies without dev-dependencies
     required: false
     default: "poetry install --no-dev"
@@ -62,7 +62,7 @@ runs:
     - name: Install dependencies
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
-      run: "${{ inputs.no-dev-deps == 'true' && inputs.poetry-install-cmd-no-dev || inputs.poetry-install-cmd }}"
+      run: "${{ inputs.no-dev-deps == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"
 
     - name: Validate venv
       shell: bash
@@ -81,9 +81,9 @@ outputs:
   cache-buster:
     description: Same as input
     value: ${{ inputs.cache-buster }}
-  poetry-install-cmd:
+  install-cmd:
     description: Same as input
-    value: ${{ inputs.poetry-install-cmd }}
-  poetry-install-cmd-no-dev:
+    value: ${{ inputs.install-cmd }}
+  install-cmd-no-dev:
     description: Same as input
-    value: ${{ inputs.poetry-install-cmd-no-dev }}
+    value: ${{ inputs.install-cmd-no-dev }}
