@@ -1,5 +1,5 @@
 name: Initialize Dependencies
-description: Install project dependencies
+description: Install Python Poetry project dependencies
 
 
 inputs:
