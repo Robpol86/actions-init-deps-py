@@ -1,0 +1,43 @@
+name: Test Invalid Cache
+
+on:
+  pull_request:
+  push:
+
+jobs:
+
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: "cp -v tests/test-cache/* ."}
+      - name: Init cache
+        id: init
+        uses: ./
+        with: {cache-buster: "${{ format('{0}|{1}|{2}', github.repository, github.run_id, github.run_attempt) }}"}
+      - name: Verify no cache hit
+        env:
+          CACHE_HIT: "${{ steps.init.outputs.cache-hit }}"
+          WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"
+          END_RESULT_VALID: "${{ steps.init.outputs.cache-end-result-valid }}"
+        run: 'set -ux; test -z "$CACHE_HIT"; test -z "$WAS_VALID"; test "$END_RESULT_VALID" == "true"'
+      - name: Invalidate cache
+        run: "rm -v .venv/bin/python"
+    outputs:
+      cache-buster: "${{ steps.init.outputs.cache-buster }}"
+
+  recover:
+    needs: create
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: "cp -v tests/test-cache/* ."}
+      - {name: Init cache, id: init, uses: ./, with: {cache-buster: "${{ needs.create.outputs.cache-buster }}"}}
+      - name: Verify cache hit
+        env:
+          CACHE_HIT: "${{ steps.init.outputs.cache-hit }}"
+          WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"
+          END_RESULT_VALID: "${{ steps.init.outputs.cache-end-result-valid }}"
+        run: 'set -ux; test "$CACHE_HIT" == "true"; test "$WAS_VALID" == "false"; test "$END_RESULT_VALID" == "true"'
+    outputs:
+      cache-buster: "${{ steps.init.outputs.cache-buster }}"
