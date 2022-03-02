@@ -1,0 +1,63 @@
+name: Test Defaults
+
+on:
+  pull_request:
+  push:
+
+jobs:
+
+  test-no-dev-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
+      - {name: Initialize dependencies, uses: ./}
+      - name: Verify Python installed
+        run: |
+          set -x
+          python -V
+          python -V |grep -q '^Python 3[.]10[.]'
+      - name: Verify Poetry installed
+        run: |
+          set -x
+          poetry --ansi -V
+          poetry config --ansi --list
+      - name: Verify Poetry config
+        run: |
+          set -x
+          poetry config --list |grep -Fx "virtualenvs.in-project = true"
+      - name: Verify dependencies
+        run: |
+          set -x
+          poetry run pip freeze
+          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
+          grep -iFx pygments /tmp/installed.txt  # Include
+          ! grep -iFx flake8 /tmp/installed.txt  # Exclude
+
+  test-with-dev-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
+      - {name: Initialize dependencies, uses: ./, with: {no-dev-deps: "false"}}
+      - name: Verify Python installed
+        run: |
+          set -x
+          python -V
+          python -V |grep -q '^Python 3[.]10[.]'
+      - name: Verify Poetry installed
+        run: |
+          set -x
+          poetry --ansi -V
+          poetry config --ansi --list
+      - name: Verify Poetry config
+        run: |
+          set -x
+          poetry config --list |grep -Fx "virtualenvs.in-project = true"
+      - name: Verify dependencies
+        run: |
+          set -x
+          poetry run pip freeze
+          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
+          grep -iFx pygments /tmp/installed.txt  # Include
+          grep -iFx flake8 /tmp/installed.txt  # Include
