@@ -53,9 +53,12 @@ runs:
       shell: bash
       run: |
         poetry env info --ansi
-        if poetry env info --no-ansi |grep -qE "^Valid: +True"; then
+        temp_file="$(mktemp)"
+        poetry env info --no-ansi > "$temp_file"
+        if grep -qE "^Valid: +True" "$temp_file"; then
           echo "::set-output name=is-valid::true"
         fi
+        rm "$temp_file"
 
     # TODO: Evict cache on invalid venv: https://github.com/actions/cache/issues/2
 
@@ -65,10 +68,17 @@ runs:
       run: "${{ inputs.no-dev-deps == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"
 
     - name: Validate venv
+      if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
       run: |
         poetry env info --ansi
-        poetry env info --no-ansi |grep -qE "^Valid: +True"
+        temp_file="$(mktemp)"
+        poetry env info --no-ansi > "$temp_file"
+        if ! grep -qE "^Valid: +True" "$temp_file"; then
+          echo "Virtualenv is invalid" >&2
+          exit 1
+        fi
+        rm "$temp_file"
 
 
 outputs:
