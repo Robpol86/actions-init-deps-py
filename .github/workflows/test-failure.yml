@@ -1,0 +1,26 @@
+name: Test Failure
+
+on:
+  pull_request:
+  push:
+
+jobs:
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
+      - name: Initialize dependencies
+        id: init-deps
+        uses: ./
+        with: {postargs: " && rm -v .venv/bin/python"}
+        continue-on-error: true
+      - name: Verify failed
+        env:
+          CONCLUSION: "${{ steps.init-deps.outcome }}"
+          END_RESULT_VALID: "${{ steps.init-deps.outputs.cache-end-result-valid }}"
+        run: |
+          set -ux
+          test "CONCLUSION: $CONCLUSION" == "CONCLUSION: failure"
+          test "END_RESULT_VALID: $END_RESULT_VALID" == "END_RESULT_VALID: false"

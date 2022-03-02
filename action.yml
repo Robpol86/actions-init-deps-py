@@ -61,6 +61,8 @@ runs:
         poetry env info --no-ansi > "$temp_file"
         if grep -qE "^Valid: +True" "$temp_file"; then
           echo "::set-output name=is-valid::true"
+        else
+          echo "::set-output name=is-valid::false"
         fi
         rm "$temp_file"
 
@@ -73,6 +75,7 @@ runs:
       run: "${{ env.INSTALL_CMD }} ${{ inputs.postargs }}"
 
     - name: Validate venv
+      id: validate2
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
       run: |
@@ -80,9 +83,11 @@ runs:
         temp_file="$(mktemp)"
         poetry env info --no-ansi > "$temp_file"
         if ! grep -qE "^Valid: +True" "$temp_file"; then
+          echo "::set-output name=is-valid::false"
           echo "Virtualenv is invalid" >&2
           exit 1
         fi
+        echo "::set-output name=is-valid::true"
         rm "$temp_file"
 
 
@@ -105,3 +110,12 @@ outputs:
   postargs:
     description: Same as input
     value: ${{ inputs.postargs }}
+  cache-hit:
+    description: If an exact match was found for the generated cache key
+    value: ${{ steps.cache.outputs.cache-hit }}
+  cache-was-valid:
+    description: If the restored cache was valid
+    value: ${{ steps.validate.outputs.is-valid }}
+  cache-end-result-valid:
+    description: If the restored cache was valid at the end of this action's run
+    value: ${{ steps.validate2.outputs.is-valid }}
