@@ -1,8 +1,4 @@
-name: Test Failure
-
-on:
-  pull_request:
-  push:
+on: [pull_request, push]
 
 jobs:
 
@@ -10,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
+      - {name: Copy test files, run: "cp -v tests/test-installed-deps/* ."}
       - name: Initialize dependencies
         id: init-deps
         uses: ./
