@@ -23,6 +23,10 @@ inputs:
     description: Command to install project dependencies without dev-dependencies
     required: false
     default: "poetry install --no-dev"
+  postargs:
+    description: Append arguments to the install command
+    required: false
+    default: ""
 
 
 runs:
@@ -44,7 +48,7 @@ runs:
       id: cache
       uses: actions/cache@v2
       with:
-        key: "${{ runner.os }}-venv-${{ hashFiles('poetry.lock') }}-${{ inputs.no-dev-deps }}-${{ inputs.cache-buster }}"
+        key: "${{ runner.os }}-venv-${{ hashFiles('poetry.lock') }}-${{ join(inputs.*, '@') }}"
         path: .venv
 
     - name: Validate venv
@@ -65,7 +69,8 @@ runs:
     - name: Install dependencies
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
-      run: "${{ inputs.no-dev-deps == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"
+      env: {INSTALL_CMD: "${{ inputs.no-dev-deps == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"}
+      run: "${{ env.INSTALL_CMD }} ${{ inputs.postargs }}"
 
     - name: Validate venv
       if: "steps.validate.outputs.is-valid != 'true'"
@@ -97,3 +102,6 @@ outputs:
   install-cmd-no-dev:
     description: Same as input
     value: ${{ inputs.install-cmd-no-dev }}
+  postargs:
+    description: Same as input
+    value: ${{ inputs.postargs }}
