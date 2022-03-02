@@ -1,0 +1,29 @@
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "Test"
+version = "0.0.1"
+description = "Mock project."
+authors = ["Robpol86 <robpol86@gmail.com>"]
+license = "BSD-2-Clause"
+classifiers = [
+    "Private :: Do Not Upload",
+]
+
+[tool.poetry.urls]
+repository = "https://github.com/Robpol86/actions-init-deps-py"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pygments = "*"  # Arbitrary dependency.
+beautifulsoup4 = {version = "*", optional = true}  # Arbitrary dependency.
+
+[tool.poetry.extras]
+bs4 = [
+    "beautifulsoup4",
+]
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"  # Arbitrary dependency.
