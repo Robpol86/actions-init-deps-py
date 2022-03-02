@@ -11,7 +11,7 @@ jobs:
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Copy test files, run: "cp -v tests/test-postargs/* ."}
-      - {name: Initialize dependencies, uses: ./}
+      - {name: Initialize dependencies, uses: ./, with: {no-dev: "true"}}
       - name: Verify dependencies
         run: |
           set -ux
@@ -26,7 +26,7 @@ jobs:
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Copy test files, run: "cp -v tests/test-postargs/* ."}
-      - {name: Initialize dependencies, uses: ./, with: {postargs: "-E bs4"}}
+      - {name: Initialize dependencies, uses: ./, with: {postargs: "-E bs4", no-dev: "true"}}
       - name: Verify dependencies
         run: |
           set -ux
@@ -41,7 +41,7 @@ jobs:
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Copy test files, run: "cp -v tests/test-postargs/* ."}
-      - {name: Initialize dependencies, uses: ./, with: {postargs: "-E bs4", no-dev-deps: "false"}}
+      - {name: Initialize dependencies, uses: ./, with: {postargs: "-E bs4"}}
       - name: Verify dependencies
         run: |
           set -ux

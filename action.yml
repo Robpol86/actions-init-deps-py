@@ -7,10 +7,10 @@ inputs:
     description: Python version to install
     required: false
     default: "3.10"
-  no-dev-deps:
-    description: Whether to exclude pyproject.toml tool.poetry.dev-dependencies
+  no-dev:
+    description: Whether to exclude tool.poetry.dev-dependencies in pyproject.toml
     required: false
-    default: "true"
+    default: "false"
   install-cmd:
     description: Command to install all project dependencies
     required: false
@@ -71,7 +71,7 @@ runs:
     - name: Install dependencies
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
-      env: {INSTALL_CMD: "${{ inputs.no-dev-deps == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"}
+      env: {INSTALL_CMD: "${{ inputs.no-dev == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"}
       run: "${{ env.INSTALL_CMD }} ${{ inputs.postargs }}"
 
     - name: Validate venv
@@ -95,9 +95,9 @@ outputs:
   python-version:
     description: Same as input
     value: ${{ inputs.python-version }}
-  no-dev-deps:
+  no-dev:
     description: Same as input
-    value: ${{ inputs.no-dev-deps }}
+    value: ${{ inputs.no-dev }}
   install-cmd:
     description: Same as input
     value: ${{ inputs.install-cmd }}

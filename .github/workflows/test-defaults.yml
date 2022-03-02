@@ -6,12 +6,12 @@ on:
 
 jobs:
 
-  test-no-dev-deps:
+  test-no-dev:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
-      - {name: Initialize dependencies, uses: ./}
+      - {name: Initialize dependencies, uses: ./, with: {no-dev: "true"}}
       - name: Verify Python installed
         run: |
           set -ux
@@ -39,7 +39,7 @@ jobs:
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Copy test files, run: "cp -v tests/test-defaults/* ."}
-      - {name: Initialize dependencies, uses: ./, with: {no-dev-deps: "false"}}
+      - {name: Initialize dependencies, uses: ./}
       - name: Verify Python installed
         run: |
           set -ux
