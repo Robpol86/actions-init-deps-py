@@ -9,12 +9,13 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
