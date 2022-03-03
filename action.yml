@@ -7,6 +7,10 @@ inputs:
     description: Python version to install
     required: false
     default: "3.10"
+  install-cmd:
+    description: Override poetry install command, overrides no-dev and poetry-install-cmd*
+    required: false
+    default: ""
   no-dev:
     description: Whether to exclude tool.poetry.dev-dependencies in pyproject.toml
     required: false
@@ -72,10 +76,16 @@ runs:
       id: install
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
-      env: {INSTALL_CMD: "${{ inputs.no-dev == 'true' && inputs.poetry-install-cmd-no-dev || inputs.poetry-install-cmd }}"}
+      env:
+        INSTALL_CMD:
+          "${{
+            inputs.install-cmd || (
+              inputs.no-dev == 'true' && inputs.poetry-install-cmd-no-dev || inputs.poetry-install-cmd
+            )
+          }}${{ inputs.postargs }}"
       run: |
-        ${{ env.INSTALL_CMD }}${{ inputs.postargs }}
-        echo "::set-output name=cmd::${{ env.INSTALL_CMD }}${{ inputs.postargs }}"
+        ${{ env.INSTALL_CMD }}
+        echo "::set-output name=cmd::$INSTALL_CMD"
 
     - name: Validate venv
       id: validate2
@@ -98,6 +108,9 @@ outputs:
   python-version:
     description: Same as input
     value: ${{ inputs.python-version }}
+  install-cmd:
+    description: Same as input
+    value: ${{ inputs.install-cmd }}
   no-dev:
     description: Same as input
     value: ${{ inputs.no-dev }}
