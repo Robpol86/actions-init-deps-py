@@ -1,8 +1,7 @@
 on: [pull_request, push]
 
 env:
-  CACHE_BUSTER: "${{ format('{0}|{1}|{2}', github.run_id, github.run_number, github.run_attempt) }}"
-  TEST_FILES: "test-installed-deps"
+  CACHE_BUSTER: "${{ format('{0}|{1}|{2}|{3}', github.run_id, github.run_number, github.run_attempt, github.job) }}"
 
 jobs:
 
@@ -10,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
       - name: Verify Python installed
         run: |
@@ -38,7 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
       - name: Verify Python installed
         run: |
