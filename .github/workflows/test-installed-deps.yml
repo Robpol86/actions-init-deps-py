@@ -1,41 +1,17 @@
 on: [pull_request, push]
 
+env:
+  CACHE_BUSTER: "${{ format('{0}|{1}|{2}', github.run_id, github.run_number, github.run_attempt) }}"
+  TEST_FILES: "test-installed-deps"
+
 jobs:
 
-  test-no-dev:
+  test:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: "cp -v tests/test-installed-deps/* ."}
-      - {name: Initialize dependencies, uses: ./, with: {no-dev: "true"}}
-      - name: Verify Python installed
-        run: |
-          set -ux
-          python -V
-          python -V |grep -q '^Python 3[.]10[.]'
-      - name: Verify Poetry installed
-        run: |
-          set -ux
-          poetry --ansi -V
-          poetry config --ansi --list
-      - name: Verify Poetry config
-        run: |
-          set -ux
-          poetry config --list |grep -Fx "virtualenvs.in-project = true"
-      - name: Verify dependencies
-        run: |
-          set -ux
-          poetry run pip freeze
-          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
-          grep -iFx pygments /tmp/installed.txt  # Include
-          ! grep -iFx flake8 /tmp/installed.txt  # Exclude
-
-  test-with-dev-deps:
-    runs-on: ubuntu-latest
-    steps:
-      - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: "cp -v tests/test-installed-deps/* ."}
-      - {name: Initialize dependencies, uses: ./}
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
       - name: Verify Python installed
         run: |
           set -ux
@@ -57,3 +33,31 @@ jobs:
           poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
           grep -iFx pygments /tmp/installed.txt  # Include
           grep -iFx flake8 /tmp/installed.txt  # Include
+
+  test-no-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
+      - name: Verify Python installed
+        run: |
+          set -ux
+          python -V
+          python -V |grep -q '^Python 3[.]10[.]'
+      - name: Verify Poetry installed
+        run: |
+          set -ux
+          poetry --ansi -V
+          poetry config --ansi --list
+      - name: Verify Poetry config
+        run: |
+          set -ux
+          poetry config --list |grep -Fx "virtualenvs.in-project = true"
+      - name: Verify dependencies
+        run: |
+          set -ux
+          poetry run pip freeze
+          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
+          grep -iFx pygments /tmp/installed.txt  # Include
+          ! grep -iFx flake8 /tmp/installed.txt  # Exclude
