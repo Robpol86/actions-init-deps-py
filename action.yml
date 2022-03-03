@@ -11,11 +11,11 @@ inputs:
     description: Whether to exclude tool.poetry.dev-dependencies in pyproject.toml
     required: false
     default: "false"
-  install-cmd:
+  poetry-install-cmd:
     description: Command to install all project dependencies
     required: false
     default: "poetry install"
-  install-cmd-no-dev:
+  poetry-install-cmd-no-dev:
     description: Command to install project dependencies without dev-dependencies
     required: false
     default: "poetry install --no-dev"
@@ -69,10 +69,13 @@ runs:
     # TODO: Evict cache on invalid venv: https://github.com/actions/cache/issues/2
 
     - name: Install dependencies
+      id: install
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
-      env: {INSTALL_CMD: "${{ inputs.no-dev == 'true' && inputs.install-cmd-no-dev || inputs.install-cmd }}"}
-      run: "${{ env.INSTALL_CMD }} ${{ inputs.postargs }}"
+      env: {INSTALL_CMD: "${{ inputs.no-dev == 'true' && inputs.poetry-install-cmd-no-dev || inputs.poetry-install-cmd }}"}
+      run: |
+        ${{ env.INSTALL_CMD }}${{ inputs.postargs }}
+        echo "::set-output name=cmd::${{ env.INSTALL_CMD }}${{ inputs.postargs }}"
 
     - name: Validate venv
       id: validate2
@@ -98,12 +101,12 @@ outputs:
   no-dev:
     description: Same as input
     value: ${{ inputs.no-dev }}
-  install-cmd:
+  poetry-install-cmd:
     description: Same as input
-    value: ${{ inputs.install-cmd }}
-  install-cmd-no-dev:
+    value: ${{ inputs.poetry-install-cmd }}
+  poetry-install-cmd-no-dev:
     description: Same as input
-    value: ${{ inputs.install-cmd-no-dev }}
+    value: ${{ inputs.poetry-install-cmd-no-dev }}
   postargs:
     description: Same as input
     value: ${{ inputs.postargs }}
@@ -119,3 +122,6 @@ outputs:
   cache-end-result-valid:
     description: If the restored cache was valid at the end of this action's run
     value: ${{ steps.validate2.outputs.is-valid }}
+  install-cmd-out:
+    description: Install command actually used by the action
+    value: ${{ steps.install.outputs.cmd }}
