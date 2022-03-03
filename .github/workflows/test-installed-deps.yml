@@ -6,7 +6,10 @@ env:
 jobs:
 
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
@@ -28,12 +31,15 @@ jobs:
         run: |
           set -ux
           poetry run pip freeze
-          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
-          grep -iFx pygments /tmp/installed.txt  # Include
-          grep -iFx flake8 /tmp/installed.txt  # Include
+          poetry run pip freeze |cut -d" " -f1 |tee installed.txt
+          grep -iFx pygments installed.txt  # Include
+          grep -iFx flake8 installed.txt  # Include
 
   test-no-dev:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
@@ -55,6 +61,6 @@ jobs:
         run: |
           set -ux
           poetry run pip freeze
-          poetry run pip freeze |cut -d" " -f1 |tee /tmp/installed.txt
-          grep -iFx pygments /tmp/installed.txt  # Include
-          ! grep -iFx flake8 /tmp/installed.txt  # Exclude
+          poetry run pip freeze |cut -d" " -f1 |tee installed.txt
+          grep -iFx pygments installed.txt  # Include
+          ! grep -iFx flake8 installed.txt  # Exclude
