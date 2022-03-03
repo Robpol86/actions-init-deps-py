@@ -9,12 +9,13 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -23,12 +24,13 @@ jobs:
   test-no-dev:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -37,12 +39,13 @@ jobs:
   test-postargs:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -51,12 +54,13 @@ jobs:
   test-postargs-no-dev:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls", no-dev: "true"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -65,12 +69,13 @@ jobs:
   test-install-cmd:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -79,12 +84,13 @@ jobs:
   test-install-cmd-no-dev:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", no-dev: "true"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
@@ -93,12 +99,13 @@ jobs:
   test-install-cmd-postargs:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", postargs: " && ls"}}
       - name: Verify
+        shell: bash
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
         run: |
           set -ux
