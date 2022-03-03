@@ -1,21 +1,23 @@
 on: [pull_request, push]
 
+env:
+  CACHE_BUSTER: "${{ format('{0}|{1}|{2}|{3}', github.run_id, github.run_number, github.run_attempt, github.job) }}"
+  TEST_FILES: "test-installed-deps"
+
 jobs:
 
   create:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: "cp -v tests/test-cache/* ."}
-      - name: Init cache
-        id: init
-        uses: ./
-        with: {cache-buster: "${{ format('{0}|{1}|{2}', github.repository, github.run_id, github.run_attempt) }}"}
-      - name: Verify no cache hit
-        env:
-          CACHE_HIT: "${{ steps.init.outputs.cache-hit }}"
-          WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"
-        run: 'set -ux; test -z "$CACHE_HIT"; test -z "$WAS_VALID"'
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
+      - name: Verify
+        env: {CACHE_HIT: "${{ steps.init.outputs.cache-hit }}", CACHE_WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"}
+        run: |
+          set -ux
+          test -z "$CACHE_HIT"
+          test -z "$CACHE_WAS_VALID"
     outputs:
       cache-buster: "${{ steps.init.outputs.cache-buster }}"
 
@@ -24,12 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: "cp -v tests/test-cache/* ."}
-      - {name: Init cache, id: init, uses: ./, with: {cache-buster: "${{ needs.create.outputs.cache-buster }}"}}
-      - name: Verify cache hit
-        env:
-          CACHE_HIT: "${{ steps.init.outputs.cache-hit }}"
-          WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"
-        run: 'set -ux; test "$CACHE_HIT" == "true"; test "$WAS_VALID" == "true"'
-    outputs:
-      cache-buster: "${{ steps.init.outputs.cache-buster }}"
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ needs.create.outputs.cache-buster }}"}}
+      - name: Verify
+        env: {CACHE_HIT: "${{ steps.init.outputs.cache-hit }}", CACHE_WAS_VALID: "${{ steps.init.outputs.cache-was-valid }}"}
+        run: |
+          set -ux
+          test "CACHE_HIT: $CACHE_HIT" == "CACHE_HIT: true"
+          test "CACHE_WAS_VALID: $CACHE_WAS_VALID" == "CACHE_WAS_VALID: true"
