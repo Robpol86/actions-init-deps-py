@@ -1,3 +1,4 @@
+name: test-installed-deps
 on: [pull_request, push]
 
 env:

@@ -1,3 +1,4 @@
+name: test-install-cmd
 on: [pull_request, push]
 
 env:

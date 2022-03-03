@@ -1,3 +1,4 @@
+name: test-cache-invalid
 on: [pull_request, push]
 
 env:

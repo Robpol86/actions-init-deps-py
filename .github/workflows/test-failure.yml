@@ -1,3 +1,4 @@
+name: test-failure
 on: [pull_request, push]
 
 env:
