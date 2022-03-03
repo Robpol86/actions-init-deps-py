@@ -1,7 +1,7 @@
 on: [pull_request, push]
 
 env:
-  CACHE_BUSTER: "${{ format('{0}|{1}|{2}', github.run_id, github.run_number, github.run_attempt) }}"
+  CACHE_BUSTER: "${{ format('{0}|{1}|{2}|{3}', github.run_id, github.run_number, github.run_attempt, github.job) }}"
 
 jobs:
 
