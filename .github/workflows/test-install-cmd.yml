@@ -2,7 +2,6 @@ on: [pull_request, push]
 
 env:
   CACHE_BUSTER: "${{ format('{0}|{1}|{2}|{3}', github.run_id, github.run_number, github.run_attempt, github.job) }}"
-  TEST_FILES: "test-installed-deps"
 
 jobs:
 
@@ -10,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -22,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -34,7 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -46,7 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls", no-dev: "true"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -58,7 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -70,7 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", no-dev: "true"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
@@ -82,7 +75,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
-      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", postargs: " && ls"}}
       - name: Verify
         env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
