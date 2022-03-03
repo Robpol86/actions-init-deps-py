@@ -1,3 +1,4 @@
+name: test-install-cmd
 on: [pull_request, push]
 
 env:
@@ -6,7 +7,10 @@ env:
 jobs:
 
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
@@ -17,7 +21,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install"
 
   test-no-dev:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", no-dev: "true"}}
@@ -28,7 +35,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install --no-dev"
 
   test-postargs:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls"}}
@@ -39,7 +49,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install && ls"
 
   test-postargs-no-dev:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && ls", no-dev: "true"}}
@@ -50,7 +63,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install --no-dev && ls"
 
   test-install-cmd:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run"}}
@@ -61,7 +77,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install --dry-run"
 
   test-install-cmd-no-dev:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", no-dev: "true"}}
@@ -72,7 +91,10 @@ jobs:
           test "$INSTALL_CMD_OUT" == "poetry install --dry-run"
 
   test-install-cmd-postargs:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+    runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
       - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", postargs: " && ls"}}

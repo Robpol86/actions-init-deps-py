@@ -1,3 +1,4 @@
+name: test-cache
 on: [pull_request, push]
 
 env:
