@@ -53,3 +53,39 @@ jobs:
         run: |
           set -ux
           test "$INSTALL_CMD_OUT" == "poetry install --no-dev && ls"
+
+  test-install-cmd:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run"}}
+      - name: Verify
+        env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
+        run: |
+          set -ux
+          test "$INSTALL_CMD_OUT" == "poetry install --dry-run"
+
+  test-install-cmd-no-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", no-dev: "true"}}
+      - name: Verify
+        env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
+        run: |
+          set -ux
+          test "$INSTALL_CMD_OUT" == "poetry install --dry-run"
+
+  test-install-cmd-postargs:
+    runs-on: ubuntu-latest
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Copy test files, run: 'cp -v "tests/$TEST_FILES"/* .'}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}", install-cmd: "poetry install --dry-run", postargs: " && ls"}}
+      - name: Verify
+        env: {INSTALL_CMD_OUT: "${{ steps.init.outputs.install-cmd-out }}"}
+        run: |
+          set -ux
+          test "$INSTALL_CMD_OUT" == "poetry install --dry-run && ls"
