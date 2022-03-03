@@ -9,7 +9,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]  # TODO windows-latest
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: "${{matrix.os}}"
     steps:
       - {name: Check out repository code, uses: actions/checkout@v2}
@@ -19,6 +19,7 @@ jobs:
         with: {cache-buster: "${{ env.CACHE_BUSTER }}", postargs: " && rm -v .venv/bin/python"}
         continue-on-error: true
       - name: Verify
+        shell: bash
         env: {CONCLUSION: "${{ steps.init.outcome }}", END_RESULT_VALID: "${{ steps.init.outputs.cache-end-result-valid }}"}
         run: |
           set -ux
