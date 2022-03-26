@@ -1,0 +1,40 @@
+name: test-versions
+on: [pull_request, push]
+
+env:
+  CACHE_BUSTER: "${{ format('{0}|{1}|{2}|{3}', github.run_id, github.run_number, github.run_attempt, github.job) }}"
+
+jobs:
+
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: "${{matrix.os}}"
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - {name: Init, id: init, uses: ./, with: {cache-buster: "${{ env.CACHE_BUSTER }}"}}
+      - name: Verify Python
+        shell: bash
+        run: set -ux; [[ "$(python -V)" == Python\ 3.10.* ]]
+      - name: Verify Poetry
+        shell: bash
+        run: set -ux; [[ "$(poetry -V)" == Poetry*version\ 1.1.* ]]
+
+  test-pin:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: "${{matrix.os}}"
+    steps:
+      - {name: Check out repository code, uses: actions/checkout@v2}
+      - name: Init
+        id: init
+        uses: ./
+        with: {cache-buster: "${{ env.CACHE_BUSTER }}", python-version: "3.9", poetry-version: "1.2.0b1"}
+      - name: Verify Python
+        shell: bash
+        run: set -ux; [[ "$(python -V)" == Python\ 3.9.* ]]
+      - name: Verify Poetry
+        shell: bash
+        run: set -ux; [[ "$(poetry -V)" == Poetry*version\ 1.2.* ]]

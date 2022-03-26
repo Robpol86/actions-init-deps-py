@@ -7,6 +7,10 @@ inputs:
     description: Python version to install
     required: false
     default: "3.10"
+  poetry-version:
+    description: Poetry version to install
+    required: false
+    default: "1.1.13"
   install-cmd:
     description: Override poetry install command, overrides no-dev and poetry-install-cmd*
     required: false
@@ -43,6 +47,7 @@ runs:
 
     - name: Install Poetry
       uses: abatilo/actions-poetry@v2.1.4
+      with: {poetry-version: "${{ inputs.poetry-version }}"}
 
     - name: Configure Poetry
       shell: bash
@@ -108,6 +113,9 @@ outputs:
   python-version:
     description: Same as input
     value: ${{ inputs.python-version }}
+  poetry-version:
+    description: Same as input
+    value: ${{ inputs.poetry-version }}
   install-cmd:
     description: Same as input
     value: ${{ inputs.install-cmd }}
