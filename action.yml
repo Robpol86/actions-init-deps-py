@@ -65,9 +65,8 @@ runs:
       if: "steps.cache.outputs.cache-hit == 'true'"
       shell: bash
       run: |
-        poetry env info --ansi
         temp_file="$(mktemp)"
-        poetry env info --no-ansi > "$temp_file"
+        poetry env info --no-ansi |tee "$temp_file"
         if grep -qE "^Valid: +True" "$temp_file"; then
           echo "::set-output name=is-valid::true"
         else
@@ -97,9 +96,8 @@ runs:
       if: "steps.validate.outputs.is-valid != 'true'"
       shell: bash
       run: |
-        poetry env info --ansi
         temp_file="$(mktemp)"
-        poetry env info --no-ansi > "$temp_file"
+        poetry env info --no-ansi |tee "$temp_file"
         if ! grep -qE "^Valid: +True" "$temp_file"; then
           echo "::set-output name=is-valid::false"
           echo "Virtualenv is invalid" >&2
